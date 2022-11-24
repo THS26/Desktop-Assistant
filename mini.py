@@ -126,7 +126,7 @@ while True:
   
 
 
-#zuber aaja charger leke
+
 
 
 

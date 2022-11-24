@@ -123,6 +123,11 @@ def run_Patrick():
 
 while True:
     run_Patrick()
+  
+
+
+#zuber aaja charger leke
+
 
 
     

@@ -40,18 +40,6 @@ def greet():
     talk(" I am Patrick ")
 
 
-# def wishing():
-#     hour = int(datetime.datetime.now().hour)
-#     if (hour>=0 and hour<12):
-#         talk('Good Morning Sir !')
-    
-#     elif(hour>=12 and hour<18):
-#         talk('Goodafter sir!')
-        
-#     elif(hour>=18):
-#         talk('Goodevening  sir!')
-
-
 def take_command():
     try:
         with sr.Microphone() as source:
@@ -111,7 +99,7 @@ def run_Patrick():
             os.startfile(os.path.join(music_dir, songs[0]))
     elif 'message 'or'whatsapp' in command:
         talk('sending message')
-        pywhatkit.sendwhatmsg("+919389715559","this is a test message from patrick",00 , 10)
+        pywhatkit.sendwhatmsg("+91938971*****","this is a test message from patrick",00 , 10)
         print("Successfully Sent!")
 
     elif 'exit' or 'close' in command:

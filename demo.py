@@ -4,27 +4,38 @@ from tkinter import E #to GUI
 import pyttsx3 #text to speech convert
 import subprocess #to go system on and off or in sleepmode
 import pywhatkit #to open and search queries on application
-import datetime
-import speech_recognition as sr
+import datetime #to tell date and time
+import speech_recognition as sr #google speech api speech to text converter 
 import wikipedia
 import webbrowser
 import wolframalpha  #to find results from userquestions of mathematics
-import os 
-import random
-import selenium 
-import winshell
-import pyjokes
+import os
+import random #to generate random values
+import winshell #to access specific folder and shell files to copy etc
+import pyjokes #to make quick python jokes 
 import shutil #to create file in read or write mode
 import json #to get weather details
 import feedparser
-import smtplib
-import datetime 
+import smtplib #to send mails
+import time
 import requests #to get weather details
 from twilio.rest import TwilioClient
 from bs4 import BeautifulSoup
 import win32com.client as wincl
-from urllib.request import urlopen
+from urllib.request import urlopen  #to fetch and open the locate usrls
 
+paths = {
+    'notepad': "C:\\Program Files\\Notepad++\\notepad++.exe",
+    'discord': "C:\\Users\\ashut\\AppData\\Local\\Discord\\app-1.0.9003\\Discord.exe",
+    'calculator': "C:\\Windows\\System32\\calc.exe"
+}
+url = ('https://newsapi.org/v2/top-headlines?'
+       'country = in&'
+       'apiKey =')
+  
+url +='f506c90992f2462f97464c2f21711224'
+
+NEWS_API_KEY=" f506c90992f2462f97464c2f21711224"
 
 #import speechRecognition as sr
 
@@ -41,13 +52,13 @@ def speak(audio):
 def wishing():
     hour = int(datetime.datetime.now().hour)
     if (hour>=0 and hour<12):
-        speak('Good Morning Naman Sir !')
+        speak('Good Morning Sir !')
     
     elif(hour>=12 and hour<18):
-        speak('Goodafter Naman !')
+        speak('Goodafter noon sir !')
         
     elif(hour>=18):
-        speak('Goodevening Naman !')
+        speak('Goodevening sir !')
  
 def getName():
     global username
@@ -62,18 +73,18 @@ def getName():
 def greet():
     hour = int(datetime.datetime.now().hour)
     if (hour>=0 and hour<12):
-        speak('Good Morning Naman Sir !')
+        speak('Good Morning Sir !')
     
     elif(hour>=12 and hour<18):
-        speak('Goodafter Naman !')
+        speak('Goodafter !')
         
     elif(hour>=18):
-        speak('Goodevening Naman !')
+        speak('Goodevening !')
          
     speak(" I am Patrick , Your new ai based Desktop assistant.  How can i help you today ? ")
     
 def send_whatsapp_message(number, message):
-    kit.sendwhatmsg_instantly(f"+91{number}", message)
+    pywhatkit.sendwhatmsg_instantly(f"+91{number}", message)
 
 def takeuserinput():
     #it takes microphone input from the user and returns string output
@@ -104,9 +115,18 @@ def sendEmail(to, content):
     server.ehlo()
     server.starttls()
     #paste your email id and password in the respective places
-    server.login('your email id', 'password') 
+    server.login('namanmotla@gmail.com', '') 
     server.sendmail('your email id', to, content)
     server.close()
+    
+def timer():
+    speak('of how much time')
+    text = str(input())
+    print("In how many minutes?")
+    local_time = float(input())
+    local_time = local_time * 60
+    time.sleep(local_time)
+    print(text)
     
 def getWeather(city_name):
     #cityName=place.get() #getting input of name of the place from user
@@ -131,20 +151,38 @@ def getWeather(city_name):
         speak(info)
     else:
         speak(" City Not Found ")
-        
-def getNews():
-    try:
-        response = requests.get('https://timesofindia.indiatimes.com/news')
-        b4soup = BeautifulSoup(response.text, 'html.parser')
-        headLines = b4soup.find('body').find_all('h3')
-        unwantedLines = ['BBC World News TV', 'BBC World Service Radio',
-                    'News daily newsletter', 'Mobile app', 'Get in touch']
 
-        for x in list(dict.fromkeys(headLines)):
-            if x.text.strip() not in unwantedLines:
-                print(x.text.strip())
-    except Exception as e:
-        print(str(e))
+def open_notepad():
+    os.startfile(paths['notepad'])
+def open_discord():
+    os.startfile(paths['discord'])
+def open_cmd():
+    os.system('start cmd')
+def open_camera():
+    subprocess.run('start microsoft.windows.camera:', shell=True)
+def open_calculator():
+    subprocess.Popen(paths['calculator'])
+        
+def get_latest_news():
+    try:
+        response = requests.get(url)
+    except:
+        engine.say("can, t access link, plz check you internet ")
+  
+    news = json.loads(response.text)
+    for new in news['articles']:
+        print("##############################################################\n")
+        print(str(new['title']), "\n\n")
+        engine.say(str(new['title']))
+        print('______________________________________________________\n')
+  
+        engine.runAndWait()
+  
+        print(str(new['description']), "\n\n")
+        engine.say(str(new['description']))
+        engine.runAndWait()
+        print("..............................................................")
+        time.sleep(2)
            
 if __name__ =="__main__":
     greet()
@@ -196,7 +234,7 @@ if __name__ =="__main__":
         elif 'who created you' in userinput or 'who made you' in userinput or 'who is your creator' in userinput or \
                     "who's creation are you" in userinput or 'who has made you' in userinput or \
                     'who has created you' in userinput:
-                speak('I was created by Naman  with the helpful suggestions from Himanshu and Zubair  which helped in how I turned out to be.')
+                speak('I was created by  with the helpful suggestions from Himanshu and Zubair  which helped in how I turned out to be.')
         
         elif 'your birthday' in userinput or 'when were you created' in userinput or 'when were you born' in userinput:
                 speak('I am a work in progress always.')
@@ -213,6 +251,9 @@ if __name__ =="__main__":
             speak("Thank you! But, It's a pleasure to hear it from you.")
         elif 'joke' in userinput:
             speak(pyjokes.get_joke())
+        elif 'timer' in userinput:
+            timer()
+        
             
         elif 'mail' in userinput:
             try:
@@ -252,7 +293,10 @@ if __name__ =="__main__":
             webbrowser.open(userinput)
 
         elif 'news' in userinput:
-            getNews()
+            speak(f"I'm reading out the latest news headlines, sir")
+            speak(get_latest_news())
+            speak("For your convenience, I am printing it on the screen sir.")
+            print(*get_latest_news(), sep='\n')
         
         elif "don't listen" in userinput or "stop listening" in userinput:
             speak("for how much time you want to stop me from listening userinputs")
@@ -270,6 +314,27 @@ if __name__ =="__main__":
         elif "sleep" in userinput:
             speak("Setting in sleep mode")
             subprocess.call("shutdown / h")
+            
+        elif "open notepad" in userinput:
+            speak("Opening notepad sir")
+            open_notepad()
+            
+        elif "open discord" in userinput:
+            speak("Opening discord sir")
+            open_discord()
+            
+            
+        elif "open cmd" in userinput or "open command prompt" in userinput:
+            speak("Opening command prompt sir")
+            open_cmd()
+            
+        elif "camera" in userinput:
+            speak("Opening camera sir")
+            open_camera()
+            
+        elif "calculator" in userinput:
+            speak("Opening calculator sir")
+            open_calculator()
         
         elif "advice" in userinput:
             speak(f"Here's an advice for you, sir")
@@ -292,30 +357,30 @@ if __name__ =="__main__":
             else:
                 file.write(note)
                 
-        elif 'play youtube' in userinput:
+        elif 'play ' in userinput:
             song = userinput.replace('play', '')
             speak('playing ' + song)
             pywhatkit.playonyt(song)
+            exit()
+            
         elif 'time' in userinput:
             time = datetime.datetime.now().strftime('%I:%M %p')
             print(time)
             speak('Current time is ' + time)
+            
         elif 'date' in userinput:
             date = datetime.datetime.now().strftime('%d /%m /%y')
             print(date)
             speak('Todays date is ' + date)
                 
-                
-        elif 'message ' in userinput or 'whatsapp' in userinput:
+        elif 'message ' in userinput or 'whatsapp' in userinput or 'send text' in userinput:
             speak('whom u want to send message')
             number = takeuserinput()
             speak('what message u want to send ')
             message= takeuserinput()
             send_whatsapp_message(number, message)
             speak('sending message')
-            pywhatkit.sendwhatmsg("+918279962646","this is a test message from patrick",00 , 10)
             print("Successfully Sent!")
-            
             
         else:
             speak("Sorry, I am not able to understand you")

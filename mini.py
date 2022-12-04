@@ -1,16 +1,29 @@
-import speech_recognition as sr
+import subprocess
+import wolframalpha
 import pyttsx3
-import pywhatkit
-import datetime
-import wikipedia
-import pyjokes
-from email.mime import audio
-from logging.config import listen
-from tkinter import E
-import webbrowser
-import sys
-import os
 import random
+import speech_recognition as sr
+import wikipedia
+import webbrowser
+import os
+import winshell
+import pyjokes
+import feedparser
+import smtplib
+import datetime 
+import json
+import requests
+from twilio.rest import Client
+from bs4 import BeautifulSoup
+import win32com.client as wincl
+from urllib.request import urlopen
+import tkinter 
+from tkinter import *
+import shutil
+import time
+import pywhatkit
+import sys
+
 
 
 
@@ -21,102 +34,283 @@ voices = engine.getProperty('voices')
 #engine.setProperty('voice', voices[1].id)
 
 
-def talk(text):
+def speak(text):
     engine.say(text)
     engine.runAndWait()
 
+def wish():
+    print("Wishing.")
+    time = int(datetime.datetime.now().hour)
+    global uname,asname
+    if time>= 0 and time<12:
+        speak("Good Morning sir or madam!")
 
-def greet():
-    hour = int(datetime.datetime.now().hour)
-    if (hour>=0 and hour<12):
-        talk('Good Morning  !')
-    
-    elif(hour>=12 and hour<18):
-        talk('Goodafter !')
-        
-    elif(hour>=18):
-        talk('Goodevening !')
-         
-    talk(" I am Patrick ")
+    elif time<18:
+        speak("Good Afternoon sir or madam!")
 
+    else:
+        speak("Good Evening sir or madam!")
+
+    asname ="Patrick v0.1"
+    speak("I am your Voice Assistant,")
+    speak(asname)
+    print("I am your Voice Assistant,",asname)
+
+
+
+def getName():
+    global uname
+    speak("Can I please know your name?")
+    uname = take_command()
+    print("Name:",uname)
+    speak("I am glad to know you!")
+    columns = shutil.get_terminal_size().columns
+    speak("How can i Help you, ")
+    speak(uname)
 
 def take_command():
+    global showCommand
+    showCommand.set("Listening....")
+    cmdLabel.config(textvariable='points')
+
+    recog = sr.Recognizer()
+    
+    with sr.Microphone() as source:
+        print("Listening to the user")
+        recog.pause_threshold = 1
+        userInput = recog.listen(source)
+
     try:
-        with sr.Microphone() as source:
-            print('listening...')
-            voice = listener.listen(source)
-            command = listener.recognize_google(voice)
-            command = command.lower()
-            if 'Patrick' in command:
-                command = command.replace('Patrick', '')
-                print(command)
-    except:
-        pass
+        print("Recognizing the command")
+        command = recog.recognize_google(userInput, language ='en-in')
+        print(f"Command is: {command}\n")
+
+    except Exception as e:
+        print(e)
+        print("Unable to Recognize the voice.")
+        return "None"
+
     return command
 
 
+def send_whatsapp_message(number, message):
+    pywhatkit.sendwhatmsg_instantly(f"+91{number}", message)
+def sendemail(to, content):
+
+    print("Sending mail to ", to)
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    #paste your email id and password in the respective places
+    server.login('namanmotla@gmail.com', '') 
+    server.sendmail('your email id', to, content)
+    server.close()
+
+
 def run_Patrick():
-    greet()
-    command = take_command()
-    print(command)
-    if 'play' in command:
-        song = command.replace('play', '')
-        talk('playing ' + song)
-        pywhatkit.playonyt(song)
-    elif 'time' in command:
-        time = datetime.datetime.now().strftime('%I:%M %p')
-        print(time)
-        talk('Current time is ' + time)
-    elif 'date' in command:
-        date = datetime.datetime.now().strftime('%d /%m /%y')
-        print(date)
-        talk('Todays date is ' + date)
-        
-    elif 'wikipedia' in command:
-        person = command.replace('wikipedia', '')
-        info = wikipedia.summary(person, 2)
-        print(info)
-        talk(info)
-    elif 'joke' in command:
-        talk(pyjokes.get_joke())
-    
-    elif 'open youtube' in command:
-        webbrowser.open("youtube.com")
+    uname=''
+    asname=''
+    os.system('cls')
+    wish()
+    getName()
+    print(uname)
+    while True:
+        command = take_command().lower()
+        print(command)
+
+        if "Patrick" in command:
+            wish()
             
-    elif 'open google' in command:
-        webbrowser.open("google.com")
+        elif 'how are you' in command:
+            speak("I am fine, Thank you")
+            speak("How are you, ")
+            speak(uname)
 
-    elif 'find' in command:
-        search=pywhatkit.search(command)
-        print("Searching on google")
-        talk('searching on google' + search)
+        elif "good morning" in command or "good afternoon" in command or "good evening" in command:
+            speak("A very" +command)
+            speak("Thank you for wishing me! Hope you are doing well!")
 
-    elif 'desktop music' in command:
-            music_dir = 'C:\\Users\TH. HIMANSHU SINGH\Music'
+        elif 'fine' in command or "good" in command:
+            speak("It's good to know that your fine")
+       
+        elif "who are you" in command:
+            speak("I am your virtual assistant.")
+
+        elif "change my name to" in command:
+            speak("What would you like me to call you, Sir or Madam ")
+            uname = take_command()
+            speak('Hello again,')
+            speak(uname)
+        
+        elif "change name" in command:
+            speak("What would you like to call me, Sir or Madam ")
+            assname = take_command()
+            speak("Thank you for naming me!")
+
+        elif "what's your name" in command:
+            speak("People call me")
+            speak(assname)
+        
+        elif 'time' in command:
+            strTime = datetime.datetime.now()
+            curTime=str(strTime.hour)+"hours"+str(strTime.minute)+"minutes"+str(strTime.second)+"seconds"
+            speak(uname)
+            speak(f" the time is {curTime}")
+            print(curTime)
+
+        elif 'wikipedia' in command:
+            speak('Searching Wikipedia')
+            command = command.replace("wikipedia", "")
+            results = wikipedia.summary(command, sentences = 3)
+            speak("These are the results from Wikipedia")
+            print(results)
+            speak(results)
+
+        elif 'open youtube' in command:
+            speak("Here you go, the Youtube is opening\n")
+            webbrowser.open("youtube.com")
+
+        elif 'open google' in command:
+            speak("Opening Google\n")
+            webbrowser.open("google.com")
+
+        elif 'play music' in command or "play song" in command:
+            speak("Enjoy the music!")
+            music_dir = "C:\\Users\\Gayathri\\Music"
             songs = os.listdir(music_dir)
             print(songs)
-            random.shuffle(songs)    
-            os.startfile(os.path.join(music_dir, songs[0]))
-    elif 'message 'or'whatsapp' in command:
-        talk('sending message')
-        pywhatkit.sendwhatmsg("+91938971*****","this is a test message from patrick",00 , 10)
-        print("Successfully Sent!")
+            random = os.startfile(os.path.join(music_dir, songs[1]))
 
-    elif 'exit' or 'close' in command:
-        sys.exit()
+        elif 'joke' in command:
+            speak(pyjokes.get_joke())
 
-    else:
-        talk('Please say the command again.')
+        elif "will you be my gf" in command or "will you be my bf" in command:
+            speak("I'm not sure about that, may be you should give me some time")
+
+        elif "i love you" in command:
+            speak("Thank you! But, It's a pleasure to hear it from you.")
+
+        # elif "weather" in command:
+        #     speak(" Please tell your city name ")
+        #     print("City name : ")
+        #     cityName = take_command()
+        #     getWeather(cityName)
+
+        elif "what is" in command or "who is" in command:
+            
+            client = wolframalpha.Client("API_ID")
+            res = client.query(command)
+
+            try:
+                print (next(res.results).text)
+                speak (next(res.results).text)
+            except StopIteration:
+                print ("No results")
+
+        elif 'search' in command:
+            command = command.replace("search", "")
+            webbrowser.open(command)
+
+        elif 'news' in command:
+            news = webbrowser.open_new_tab("https://timesofindia.indiatimes.com/city/ghaziabad")
+            speak('Here are some headlines from the Times of India, Happy reading')
+        
+        elif "don't listen" in command or "stop listening" in command:
+            speak("for how much time you want to stop me from listening commands")
+            a = int(take_command())
+            time.sleep(a)
+            print(a)
+        
+        elif 'shutdown system' in command:
+                speak("Hold On a Sec ! Your system is on its way to shut down")
+                subprocess.call('shutdown / p /f')
+
+        elif "restart" in command:
+            subprocess.call(["shutdown", "/r"])
+
+        elif "sleep" in command:
+            speak("Setting in sleep mode")
+            subprocess.call("shutdown / h")
+
+        elif "write a note" in command:
+            speak("What should i write, sir")
+            note = take_command()
+            file = open('jarvis.txt', 'w')
+            speak("Sir, Should i include date and time")
+            snfm = take_command()
+            if 'yes' in snfm or 'sure' in snfm:
+                strTime = datetime.datetime.now().strftime("% H:% M:% S")
+                file.write(strTime)
+                file.write(" :- ")
+                file.write(note)
+            else:
+                file.write(note)
+        elif 'play' in command:
+            song = command.replace('play', '')
+            speak('playing ' + song)
+            pywhatkit.playonyt(song)
+        elif 'message ' in command or 'whatsapp' in command:
+            speak('whom u want to send message')
+            number = take_command()
+            speak('what message u want to send ')
+            message= take_command()
+            send_whatsapp_message(number, message)
+            speak('sending message')
+            print("Successfully Sent!")
+        
+        elif 'wikipedia' in command:
+            person = command.replace('wikipedia', '')
+            info = wikipedia.summary(person, 2)
+            print(info)
+            speak(info)
+        elif 'joke' in command:
+            speak(pyjokes.get_joke())
+        elif 'find' in command:
+            search=pywhatkit.search(command)
+            print("Searching on google")
+            speak('searching on google' + search)
+        elif 'mail' in command:
+            try:
+                speak("Whom should I send the mail")
+                to = input()
+                speak("What is the body?")
+                content = take_command()
+                sendemail(to, content)
+                speak("Email has been sent successfully !")
+            except Exception as e:
+                print(e)
+                speak("I am sorry, not able to send this email")
+
+        elif 'exit' in command or 'close' in command:
+            sys.exit()
+        else:
+            speak('Please say the command again.')  
+            command = take_command()
+            print(command)
+                
 
 
-while True:
-    run_Patrick()
+    
+#Creating the main window 
+wn = tkinter.Tk() 
+wn.title("THS Voice Assistant")
+wn.geometry('700x300')
+wn.config(bg='LightBlue1')
   
+Label(wn, text='Welcome to meet the Voice Assistant by THS', bg='LightBlue1',
+      fg='black', font=('Courier', 15)).place(x=50, y=10)
 
+#Button to convert PDF to Audio form
+Button(wn, text="Start", bg='gray',font=('Courier', 15),
+       command=run_Patrick).place(x=290, y=100)
 
-#zuber aaja charger leke
+showCommand=StringVar()
+cmdLabel=Label(wn, textvariable=showCommand, bg='LightBlue1',
+      fg='black', font=('Courier', 15))
+cmdLabel.place(x=250, y=150)
 
+#Runs the window till it is closed
+wn.mainloop()
 
-# i am writing
 
     

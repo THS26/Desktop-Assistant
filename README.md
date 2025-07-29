@@ -1,2 +1,2 @@
 # Desktop-Assistant
-AI desktop assistant Project
+Desktop Voice Assisstant using Python Programming
